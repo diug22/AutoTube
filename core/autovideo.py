@@ -30,7 +30,7 @@ class AutoVideo :
             self.bg_list.append((tags, file_path))
             
     def gen_timeline(self):
-        self.timeline = text_to_speech_with_timings(self.text, "./temp/out_audio.mp3", 1.5)
+        self.timeline = text_to_speech_with_timings(self.text, "./temp/out_audio.mp3", 1.5, cluster_size=4)
         
     def crop_random_segment(self, background_clip, audio_duration):
         segment_length = audio_duration
@@ -65,7 +65,7 @@ class AutoVideo :
             duration = end_time - start_time
             text_size = (cropped_segment.size[0], cropped_segment.size[1])
             square_color = (0, 0, 0)  # Adjust the color of the square as needed
-            
+            text = str(text).replace(" ", "\n")
             text_clip = TextClip(text, fontsize=25, font='Arial Black', color='white', size=text_size)
             square_clip = ColorClip(text_clip.size, col=square_color).set_opacity(0.5)
             

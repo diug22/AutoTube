@@ -5,6 +5,8 @@ from tube_selenium.yt_uploader_selenium import Yt_selenium_uploader
 
 from core.video_item import VideoItem
 
+from core.reddit_sc import Reddit_sc
+
 import random
 
 def search_by_tags(file, query): 
@@ -19,7 +21,7 @@ def search_by_tags(file, query):
     
 
 session_id = "14590ef73ddd7411b35b519bf6829358"
-LOAD_NEW_REDDIT = 
+LOAD_NEW_REDDIT = True
 
 
 def __main__() :
@@ -45,23 +47,33 @@ def __main__() :
         yt_uploader = Yt_selenium_uploader()
         yt_uploader.login(username=username, password=password)
        
+    video_items = []
     
-    for line in csv:
-        print(n_video)
-        n_video += 1
-        text = line[0]
-        title = line[1]
-        desc = line[2]
-        bg_tags = line[3].split(" ")
+    if LOAD_NEW_REDDIT:
+        reddit_sc = Reddit_sc()
+        reddit_sc.get_subreddits(5)
+        reddit_sc.get_video_texts()
+        video_items = reddit_sc.video_items
+        print(len(video_items))
+    else:
+        for line in csv:
+            print(n_video)
+            n_video += 1
+            text = line[0]
+            title = line[1]
+            desc = line[2]
+            bg_tags = line[3].split(" ")
+            
+            video_item = VideoItem(tittle=title, desc=desc,content=text, tags=bg_tags)
+            video_items.append(video_item)
         
-        video_item = VideoItem(tittle=title, desc=desc,content=text, tags=bg_tags)
-
+        
+   
         
         
+    for video_item in video_items:    
+        bg_tags = ["minecraft", "misterio"]
         bg_videos = search_by_tags("bg_videos/bg_videos.csv", bg_tags)
-        
-        
-        
         v1 = AutoVideo(video_item, screen_h, screen_w, "output.mp4", random.choice(bg_videos))
         v1.generate_video()
         
@@ -71,7 +83,7 @@ def __main__() :
         if (upload_kind == "yt_api"):
             uploader.upload_video(video_path, title, desc, privacy_status)
         elif (upload_kind == 'yt_selenium'):
-            if (yt_uploader.upload_video(video_path, title, desc)):
+            if (yt_uploader.upload_video(video_path, video_item.title, video_item.desc)):
                 print("upload ok")
             
        
