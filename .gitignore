@@ -1,0 +1,4 @@
+# Ignorar archivos con extensión .config, .mp3 y .mp4
+*.config
+*.mp3
+*.mp4
