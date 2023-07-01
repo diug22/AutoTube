@@ -13,7 +13,7 @@ class AutoVideo :
     
     def __init__(self, video_item, h, w, file_name, bg_video) :
         self.video_item = video_item
-        self.text = self.video_item.content
+        self.text = self.video_item.content.encode('latin1').decode('utf8') #TODO: Fix encoding in reading content
         self.h = h
         self.w = w
         self.bg_video = bg_video
@@ -30,7 +30,7 @@ class AutoVideo :
             self.bg_list.append((tags, file_path))
             
     def gen_timeline(self):
-        self.timeline = text_to_speech_with_timings(self.text, "./temp/out_audio.mp3", 1.5, cluster_size=4)
+        self.timeline = text_to_speech_with_timings(self.text)
         
     def crop_random_segment(self, background_clip, audio_duration):
         segment_length = audio_duration
@@ -52,7 +52,7 @@ class AutoVideo :
 
     def generate_video(self):
         self.gen_timeline()
-        audio_voice = AudioSegment.from_file("./temp/out_audio.mp3").apply_gain(0)  # Set gain to 0 for voice audio
+        audio_voice = AudioSegment.from_file("./temp/tmp_audio.mp3").apply_gain(0)  # Set gain to 0 for voice audio
         
         # TODO : Create method to select random music
         audio_music = AudioSegment.from_file("./media/music/sad, crepy, mistery.mp3").apply_gain(-10)  # Set gain to -10 for music audio
@@ -90,7 +90,6 @@ class AutoVideo :
         final_clip = CompositeVideoClip([cropped_segment] + text_clips)
         
         final_clip = final_clip.set_audio(AudioFileClip(temp_audio_path))
-
         # Export the final video
         final_clip.write_videofile(
             "./out/" + self.file_name,
